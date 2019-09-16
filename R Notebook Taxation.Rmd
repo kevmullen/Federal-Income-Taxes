@@ -1,0 +1,62 @@
+---
+title: "Tax System"
+output: html_notebook
+---
+
+The following code is creating a dataframe called "df"" which is is made up of two columns, "income" and "bracket".  The income column is made up of a the 6,001 numbers making up the sequence of numbers which make up 0 to 600,000 counting by 100.  The "bracket" column in the dataframe "df" is made up of the vectors ranging from "first" to "seventh" each of which are repeted values equal to the tax rate of the seven tax brackets.  The vectors are set up to produce the correct number of repeating values to match the tax rate level to the corresponding number of income values.  Therefore, the "bracket" values are equal to the tax rates on income of the corresponding "income" value.  For example, the tax rate on someone's 100,000th dollar is equal to .12 and so the "income" value would be 100,000 and the "bracket" would be .12.
+
+```{r}
+first <- c(rep(.1,96))
+second <-c(rep(.12,387-95))
+third <-c(rep(.22,825-387))
+fourth <- c(rep(.24,1575-825))
+fifth <-c(rep(.32,2000-1575))
+sixth <-c(rep(.35,5000-2000))
+seventh <-c(rep(.37,6000-5000))
+
+income <-c(seq(0,600000,by=100))
+bracket <- c(first,second,third,fourth,fifth,sixth,seventh)
+
+df <- data.frame(income,bracket)
+```
+
+
+The next lines of code adds the column "rate" to the dataframe "df".  The column "rate" is the average tax rate on all of someone's income given the in the "income" column.
+```{r}
+rate <- c()
+for (i in 1:6001){
+  rate <- c(rate,mean(bracket[1:i]))
+}
+
+df <-data.frame(df,rate)
+```
+
+The next few lines of code add a column called "tax" to the dataframe "df".  The "tax" column represents the dollar amount in taxes some one will have to pay given the income level from "income".
+```{r}
+tax <- c()
+for (i in 1:6001){
+  tax <- c(tax,rate[i]*i*100)
+}
+
+df <-data.frame(df,tax)
+```
+
+Next I created a linear model of the taxation amounts.  This model shows the relationship between income and taxation using a polymonial function to the third degree.  The model shows how the taxation amounts relate to income if they were approximated using a continous equation.
+
+```{r}
+income2 <- income^2
+income3 <- income^3
+lm <- lm(tax ~ 1+ income + income2 +income3, data = df)
+summary(lm)
+```
+
+
+Next I created plots of the tax bracket values, average tax rates and total taxation in relation to inomce levels.
+```{r}
+library(ggplot2)
+ggplot(df, aes(income,bracket)) + geom_point()
+ggplot(df, aes(income,rate)) + geom_point()
+ggplot(df, aes(income,tax)) + geom_point()
+```
+
+
